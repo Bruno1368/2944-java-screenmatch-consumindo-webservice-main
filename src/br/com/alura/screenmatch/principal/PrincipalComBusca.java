@@ -1,5 +1,8 @@
 package br.com.alura.screenmatch.principal;
 
+import br.com.alura.screenmatch.modelos.Titulo;
+import com.google.gson.Gson;
+
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLParameters;
 import java.io.IOException;
@@ -35,9 +38,14 @@ public class PrincipalComBusca {
 
         HttpResponse<String> response = client
                 .send(request, HttpResponse.BodyHandlers.ofString());
-        System.out.println(response.body());
+        String json = response.body();
+        System.out.println(json);
 
+        Gson gson = new Gson();
 
+        Titulo filme = gson.fromJson(json, Titulo.class);
+
+        System.out.println(filme);
 
 
     }
