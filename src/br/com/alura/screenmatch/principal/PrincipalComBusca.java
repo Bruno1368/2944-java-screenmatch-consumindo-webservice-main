@@ -1,10 +1,14 @@
 package br.com.alura.screenmatch.principal;
 
 import br.com.alura.screenmatch.modelos.Titulo;
+import br.com.alura.screenmatch.modelos.TituloOmdb;
+import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLParameters;
+import javax.print.DocFlavor;
 import java.io.IOException;
 import java.net.Authenticator;
 import java.net.CookieHandler;
@@ -38,15 +42,27 @@ public class PrincipalComBusca {
 
         HttpResponse<String> response = client
                 .send(request, HttpResponse.BodyHandlers.ofString());
+
         String json = response.body();
         System.out.println(json);
 
-        Gson gson = new Gson();
+            //para letra maiscula
+        Gson gson = new GsonBuilder()
+                .setFieldNamingPolicy(FieldNamingPolicy.UPPER_CAMEL_CASE)
+                .create();
 
-        Titulo filme = gson.fromJson(json, Titulo.class);
+        //Titulo filme = gson.fromJson(json, Titulo.class);
+        TituloOmdb meuTituloOmdb = gson.fromJson(json, TituloOmdb.class);
+        //System.out.println(meuTituloOmdb);
+        try{
+            Titulo meuTitulo = new Titulo(meuTituloOmdb);
+            System.out.println("Meu titulo: "+ meuTitulo);
+        }catch(NumberFormatException err){
+            System.out.println("Aconteceu um erro de formato: ");
+            System.out.println(err.getMessage());
+        }
 
-        System.out.println(filme);
-
+        System.out.println("Programa executado corretamente");
 
     }
 
