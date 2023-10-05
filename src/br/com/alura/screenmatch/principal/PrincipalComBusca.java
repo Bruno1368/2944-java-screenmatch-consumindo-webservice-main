@@ -10,10 +10,7 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLParameters;
 import javax.print.DocFlavor;
 import java.io.IOException;
-import java.net.Authenticator;
-import java.net.CookieHandler;
-import java.net.ProxySelector;
-import java.net.URI;
+import java.net.*;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
@@ -34,36 +31,39 @@ public class PrincipalComBusca {
 
         String endereco = "https://www.omdbapi.com/?t=" + busca + "&apikey=1c0361f4";
 
+        try{
 
-        HttpClient client = HttpClient.newHttpClient();
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(endereco))
-                .build();
+            HttpClient client = HttpClient.newHttpClient();
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(endereco))
+                    .build();
 
-        HttpResponse<String> response = client
-                .send(request, HttpResponse.BodyHandlers.ofString());
+            HttpResponse<String> response = client
+                    .send(request, HttpResponse.BodyHandlers.ofString());
 
-        String json = response.body();
-        System.out.println(json);
+            String json = response.body();
+            System.out.println(json);
 
             //para letra maiscula
-        Gson gson = new GsonBuilder()
-                .setFieldNamingPolicy(FieldNamingPolicy.UPPER_CAMEL_CASE)
-                .create();
+            Gson gson = new GsonBuilder()
+                    .setFieldNamingPolicy(FieldNamingPolicy.UPPER_CAMEL_CASE)
+                    .create();
 
-        //Titulo filme = gson.fromJson(json, Titulo.class);
-        TituloOmdb meuTituloOmdb = gson.fromJson(json, TituloOmdb.class);
-        //System.out.println(meuTituloOmdb);
-        try{
+            //Titulo filme = gson.fromJson(json, Titulo.class);
+            TituloOmdb meuTituloOmdb = gson.fromJson(json, TituloOmdb.class);
+            //System.out.println(meuTituloOmdb);
+            //  try {
             Titulo meuTitulo = new Titulo(meuTituloOmdb);
-            System.out.println("Meu titulo: "+ meuTitulo);
-        }catch(NumberFormatException err){
+            System.out.println("Meu titulo: " + meuTitulo);
+        } catch (NumberFormatException err) {
             System.out.println("Aconteceu um erro de formato: ");
             System.out.println(err.getMessage());
+        }catch (IllegalArgumentException err){
+            System.out.println("O endereço está escrito em um formato inválido ");
+            //System.out.println(err.getMessage());
         }
 
         System.out.println("Programa executado corretamente");
-
     }
 
 }
