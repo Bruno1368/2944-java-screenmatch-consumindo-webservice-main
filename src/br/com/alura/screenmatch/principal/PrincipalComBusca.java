@@ -7,57 +7,84 @@ import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import java.io.FileWriter;
 import java.io.IOException;
 import java.net.*;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 public class PrincipalComBusca {
     public static void main(String[] args) throws IOException, InterruptedException {
         Scanner leitura = new Scanner(System.in);
 
-        System.out.println("Digite um filme para busca:  ");
-        var busca = leitura.nextLine();
 
-        String endereco = "https://www.omdbapi.com/?t=" + busca.replace(" ", "+") + "&apikey=1c0361f4";
+        String busca = "";
+        List<Titulo> titulos = new ArrayList<>();
+        Gson gson = new GsonBuilder()
+                .setPrettyPrinting()
+                .setFieldNamingPolicy(FieldNamingPolicy.UPPER_CAMEL_CASE)
+                .create();
 
-        try{
+        while (!busca.equalsIgnoreCase("sair")) {
 
-            HttpClient client = HttpClient.newHttpClient();
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(endereco))
-                    .build();
+            System.out.println("Digite um filme para busca:  ");
+            busca = leitura.nextLine();
 
-            HttpResponse<String> response = client
-                    .send(request, HttpResponse.BodyHandlers.ofString());
+            if(busca.equalsIgnoreCase("sair")){
+                break;
+            }
 
-            String json = response.body();
-            System.out.println(json);
+            String endereco = "https://www.omdbapi.com/?t=" + busca.replace(" ", "+") + "&apikey=1c0361f4";
 
-            //instancia gson, que transforma json em objeto, e também ajusta para letra maiscula
-            Gson gson = new GsonBuilder()
-                    .setFieldNamingPolicy(FieldNamingPolicy.UPPER_CAMEL_CASE)
-                    .create();
+            try {
 
-            //Titulo filme = gson.fromJson(json, Titulo.class);
-            TituloOmdb meuTituloOmdb = gson.fromJson(json, TituloOmdb.class);
-            //System.out.println(meuTituloOmdb);
-            //  try {
-            Titulo meuTitulo = new Titulo(meuTituloOmdb);
-            System.out.println("Meu titulo: " + meuTitulo);
-        }catch (NumberFormatException err) {
-            System.out.println("Aconteceu um erro de formato: ");
-            System.out.println(err.getMessage());
-        }catch (IllegalArgumentException err){
-            System.out.println("O endereço está escrito em um formato inválido ");
-            //System.out.println(err.getMessage());
-        }catch (ErroDeConversaoDeAnoException err){
-            System.out.println(err.getMessage());
+                HttpClient client = HttpClient.newHttpClient();
+                HttpRequest request = HttpRequest.newBuilder()
+                        .uri(URI.create(endereco))
+                        .build();
+
+                HttpResponse<String> response = client
+                        .send(request, HttpResponse.BodyHandlers.ofString());
+
+                String json = response.body();
+                System.out.println("O json: " + json);
+
+                //instancia gson, que transforma json em objeto, e também ajusta para letra maiscula
+
+
+                //Titulo filme = gson.fromJson(json, Titulo.class);
+                TituloOmdb meuTituloOmdb = gson.fromJson(json, TituloOmdb.class);
+
+                //System.out.println(meuTituloOmdb);
+                //  try {
+                Titulo meuTitulo = new Titulo(meuTituloOmdb);
+                System.out.println("Meu titulo: ");
+                System.out.println(meuTitulo);
+
+                titulos.add(meuTitulo);
+
+            } catch (NumberFormatException err) {
+                System.out.println("Aconteceu um erro de formato: ");
+                System.out.println(err.getMessage());
+            } catch (IllegalArgumentException err) {
+                System.out.println("O endereço está escrito em um formato inválido ");
+                //System.out.println(err.getMessage());
+            } catch (ErroDeConversaoDeAnoException err) {
+                System.out.println(err.getMessage());
+            }
+
         }
 
-        System.out.println("Programa executado corretamente");
+        FileWriter escrita = new FileWriter("filmes.json");
+        escrita.write(gson.toJson(titulos));
+        escrita.close();
+        System.out.println("\"Programa executado corretamente\"");
     }
 
 }
+
+
