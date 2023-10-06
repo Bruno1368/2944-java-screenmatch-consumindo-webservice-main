@@ -1,7 +1,5 @@
 package br.com.alura.screenmatch.modelos;
 
-import com.google.gson.annotations.SerializedName;
-
 public class Titulo implements Comparable<Titulo> {
         // notação
 
@@ -17,11 +15,17 @@ public class Titulo implements Comparable<Titulo> {
         this.anoDeLancamento = anoDeLancamento;
     }
 
-    public Titulo(TituloOmdb tituloOmdb) {
+    public Titulo(TituloOmdb tituloOmdb){
         this.nome = tituloOmdb.title();
-        this.anoDeLancamento = Integer.valueOf(tituloOmdb.year().substring(0, 4));
-        this.duracaoEmMinutos = Integer.valueOf(tituloOmdb.runtime().substring(0, 3));
-
+        String runtime = tituloOmdb.runtime();
+        if(tituloOmdb.year().length() >= 4){
+            this.anoDeLancamento = Integer.valueOf(tituloOmdb.year().substring(0, 4));
+        }
+        if(runtime != null && !runtime.equals("N/A")){
+            this.duracaoEmMinutos = Integer.valueOf(tituloOmdb.runtime().substring(0, 3));
+        }else{
+            this.duracaoEmMinutos = 0;
+        }
 
     }
 

@@ -1,26 +1,18 @@
 package br.com.alura.screenmatch.principal;
 
+import br.com.alura.screenmatch.excecao.ErroDeConversaoDeAnoException;
 import br.com.alura.screenmatch.modelos.Titulo;
 import br.com.alura.screenmatch.modelos.TituloOmdb;
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLParameters;
-import javax.print.DocFlavor;
 import java.io.IOException;
 import java.net.*;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.time.Duration;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 import java.util.Scanner;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Executor;
 
 public class PrincipalComBusca {
     public static void main(String[] args) throws IOException, InterruptedException {
@@ -29,7 +21,7 @@ public class PrincipalComBusca {
         System.out.println("Digite um filme para busca:  ");
         var busca = leitura.nextLine();
 
-        String endereco = "https://www.omdbapi.com/?t=" + busca + "&apikey=1c0361f4";
+        String endereco = "https://www.omdbapi.com/?t=" + busca.replace(" ", "+") + "&apikey=1c0361f4";
 
         try{
 
@@ -44,7 +36,7 @@ public class PrincipalComBusca {
             String json = response.body();
             System.out.println(json);
 
-            //para letra maiscula
+            //instancia gson, que transforma json em objeto, e também ajusta para letra maiscula
             Gson gson = new GsonBuilder()
                     .setFieldNamingPolicy(FieldNamingPolicy.UPPER_CAMEL_CASE)
                     .create();
@@ -55,12 +47,14 @@ public class PrincipalComBusca {
             //  try {
             Titulo meuTitulo = new Titulo(meuTituloOmdb);
             System.out.println("Meu titulo: " + meuTitulo);
-        } catch (NumberFormatException err) {
+        }catch (NumberFormatException err) {
             System.out.println("Aconteceu um erro de formato: ");
             System.out.println(err.getMessage());
         }catch (IllegalArgumentException err){
             System.out.println("O endereço está escrito em um formato inválido ");
             //System.out.println(err.getMessage());
+        }catch (ErroDeConversaoDeAnoException err){
+            System.out.println(err.getMessage());
         }
 
         System.out.println("Programa executado corretamente");
